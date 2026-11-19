@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0-alpha.6",
+  "notes": "Home and library match the prototype; real video thumbnails, 3 per row, 12 per page; updates in Settings.",
+  "pubDate": "2026-11-19T11:28:59Z",
+  "installer": {
+    "name": "WinRecorder_2.0.0-alpha.6_x64-setup.exe",
+    "size": 2576253,
+    "url": "/downloads/WinRecorder_2.0.0-alpha.6_x64-setup.exe"
+  },
+  "updater": {
+    "name": "WinRecorder_2.0.0-alpha.6_x64-setup.nsis.zip",
+    "size": 2557045,
+    "url": "/downloads/WinRecorder_2.0.0-alpha.6_x64-setup.nsis.zip",
+    "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRRjdmdzAzV1ZDWG96Yjh2S1BXdzF4SHZCWGRCenIwTCs2d2RoT3g2TTJicG1wZTZrRnhjZkYvYkx6OFROWXFlMmt2QzVTQ20zVittZDltTjlPZ1IwY3FnQ3Rkb1FTblEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk1MDg3NzMyCWZpbGU6V2luUmVjb3JkZXJfMi4wLjAtYWxwaGEuNl94NjQtc2V0dXAubnNpcy56aXAKUzA5SFJvQlRBMWtsM2RRWWE0UnRVZng1ZTFndnY4SHNRaGlYRDIxeUpzTU56N2NwMVFtSlFWNTFVclBLcTBOaEZMVDI0akhqY29PTlhEeEFuQU9sQ2c9PQo="
+  }
+}
