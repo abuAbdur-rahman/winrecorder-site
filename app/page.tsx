@@ -3,8 +3,8 @@ import { connection } from "next/server";
 
 import { Features } from "@/components/features";
 import { Hero } from "@/components/hero";
-import { HeroVideo } from "@/components/hero-video";
 import { HowItWorks } from "@/components/how-it-works";
+import { ProductTour } from "@/components/product-tour";
 import { Release } from "@/components/release";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
@@ -42,7 +42,7 @@ export default async function HomePage() {
           size={release.installer.size}
           pubDate={release.pubDate}
         />
-        <HeroVideo />
+        <ProductTour />
         <Features />
         <HowItWorks />
         <Release
