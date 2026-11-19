@@ -1,0 +1,1404 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A standalone landing-page prototype for WinRecorder, a focused screen recorder for Windows."
+    />
+    <meta name="theme-color" content="#090a0c" />
+    <title>WinRecorder — landing page prototype</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #090a0c;
+        --surface: #111317;
+        --surface-raised: #17191e;
+        --surface-soft: #1c1f25;
+        --line: #292c33;
+        --line-bright: #3a3e47;
+        --ink: #f5f4f0;
+        --muted: #a2a19c;
+        --quiet: #73747a;
+        --record: #ff453a;
+        --record-deep: #c92e27;
+        --display: "Bahnschrift", "Arial Narrow", sans-serif;
+        --body: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+        --data: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+        --content: min(1180px, calc(100vw - 48px));
+        --radius-lg: 22px;
+        --radius-md: 14px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 92px;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        overflow-x: hidden;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--body);
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button,
+      a {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      ::selection {
+        background: rgb(255 69 58 / 0.42);
+        color: #fff;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--ink);
+        outline-offset: 4px;
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--bg);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        border: 3px solid var(--bg);
+        border-radius: 999px;
+        background: var(--line-bright);
+      }
+
+      .skip-link {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 100;
+        transform: translateY(-140%);
+        border-radius: 999px;
+        background: var(--ink);
+        color: var(--bg);
+        padding: 10px 16px;
+        font-weight: 700;
+        transition: transform 180ms ease-out;
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+
+      .site-header {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 40;
+        padding: 16px 0;
+        background: linear-gradient(to bottom, var(--bg) 35%, transparent);
+      }
+
+      .nav {
+        width: var(--content);
+        min-height: 56px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 24px;
+        border: 1px solid rgb(255 255 255 / 0.09);
+        border-radius: 999px;
+        background: rgb(14 15 18 / 0.88);
+        padding: 6px 8px 6px 18px;
+        box-shadow: 0 18px 45px -30px #000;
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        width: max-content;
+        min-height: 44px;
+        font-weight: 720;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-mark {
+        width: 10px;
+        height: 10px;
+        border: 2px solid #ff8e87;
+        border-radius: 50%;
+        background: var(--record);
+        box-shadow: 0 0 0 4px rgb(255 69 58 / 0.12);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .nav-links a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0 13px;
+        transition:
+          color 180ms ease,
+          background 180ms ease;
+      }
+
+      .nav-links a:hover {
+        background: var(--surface-soft);
+        color: var(--ink);
+      }
+
+      .nav-cta {
+        justify-self: end;
+      }
+
+      .button {
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 0 19px;
+        background: var(--ink);
+        color: #101114;
+        font-size: 14px;
+        font-weight: 760;
+        white-space: nowrap;
+        transition:
+          transform 180ms ease,
+          background 180ms ease,
+          box-shadow 180ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        background: #fff;
+        box-shadow: 0 14px 32px -20px rgb(255 255 255 / 0.62);
+      }
+
+      .button-secondary {
+        border-color: var(--line-bright);
+        background: transparent;
+        color: var(--ink);
+      }
+
+      .button-secondary:hover {
+        background: var(--surface-raised);
+        box-shadow: none;
+      }
+
+      .windows-glyph {
+        width: 15px;
+        height: 15px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5px;
+        transform: skewY(-4deg);
+      }
+
+      .windows-glyph i {
+        display: block;
+        background: currentColor;
+      }
+
+      main {
+        display: block;
+      }
+
+      .hero {
+        width: var(--content);
+        min-height: 860px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(0, 0.88fr) minmax(520px, 1.12fr);
+        align-items: center;
+        gap: clamp(52px, 7vw, 108px);
+        padding: 148px 0 76px;
+      }
+
+      .hero-copy {
+        position: relative;
+        z-index: 2;
+      }
+
+      .status-chip {
+        width: max-content;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        padding: 6px 11px;
+        color: var(--muted);
+        font-family: var(--data);
+        font-size: 11px;
+      }
+
+      .status-chip::before {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--record);
+        content: "";
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1,
+      h2 {
+        font-family: var(--display);
+        font-weight: 680;
+        text-wrap: balance;
+      }
+
+      h1 {
+        max-width: 690px;
+        margin-top: 28px;
+        font-size: clamp(3.4rem, 6.7vw, 6rem);
+        line-height: 0.91;
+        letter-spacing: -0.04em;
+      }
+
+      .hero-lede {
+        max-width: 590px;
+        margin-top: 30px;
+        color: var(--muted);
+        font-size: clamp(1rem, 1.4vw, 1.16rem);
+        line-height: 1.75;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 36px;
+      }
+
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        margin-top: 26px;
+        color: var(--quiet);
+        font-family: var(--data);
+        font-size: 11px;
+      }
+
+      .hero-meta span {
+        position: relative;
+      }
+
+      .hero-meta span + span::before {
+        position: absolute;
+        left: -11px;
+        color: var(--line-bright);
+        content: "/";
+      }
+
+      .capture-wrap {
+        position: relative;
+        min-width: 0;
+        isolation: isolate;
+      }
+
+      .capture-wrap::before {
+        position: absolute;
+        inset: -48px -80px -56px -64px;
+        z-index: -1;
+        border-radius: 48%;
+        background: rgb(255 69 58 / 0.08);
+        filter: blur(56px);
+        content: "";
+      }
+
+      .capture-stage {
+        position: relative;
+        min-height: 568px;
+        overflow: hidden;
+        border: 1px solid var(--line-bright);
+        border-radius: var(--radius-lg);
+        background: #0d0f12;
+        box-shadow:
+          0 1px 0 rgb(255 255 255 / 0.08) inset,
+          0 50px 90px -42px #000;
+      }
+
+      .window-bar {
+        height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface-raised);
+        padding: 0 13px 0 16px;
+      }
+
+      .window-app {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 650;
+      }
+
+      .window-app .brand-mark {
+        width: 7px;
+        height: 7px;
+        border: 0;
+        box-shadow: none;
+      }
+
+      .window-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 1px;
+      }
+
+      .window-actions i {
+        width: 30px;
+        height: 26px;
+        position: relative;
+        border-radius: 4px;
+      }
+
+      .window-actions i::after {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        width: 9px;
+        height: 1px;
+        transform: translate(-50%, -50%);
+        background: var(--quiet);
+        content: "";
+      }
+
+      .window-actions i:nth-child(2)::after {
+        height: 8px;
+        border: 1px solid var(--quiet);
+        background: transparent;
+      }
+
+      .window-actions i:last-child::before,
+      .window-actions i:last-child::after {
+        width: 10px;
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+
+      .window-actions i:last-child::before {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        height: 1px;
+        background: var(--quiet);
+        content: "";
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+
+      .window-content {
+        min-height: 526px;
+        display: grid;
+        grid-template-columns: 94px 1fr;
+      }
+
+      .mock-sidebar {
+        border-right: 1px solid var(--line);
+        background: #0b0d10;
+        padding: 16px 12px;
+      }
+
+      .mock-nav-item {
+        height: 35px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        border-radius: 7px;
+        padding: 0 9px;
+        color: var(--quiet);
+        font-size: 9px;
+      }
+
+      .mock-nav-item.active {
+        background: var(--surface-soft);
+        color: var(--ink);
+      }
+
+      .mock-nav-item::before {
+        width: 10px;
+        height: 10px;
+        border: 1px solid currentColor;
+        border-radius: 2px;
+        content: "";
+      }
+
+      .mock-main {
+        position: relative;
+        padding: 27px 28px 32px;
+      }
+
+      .mock-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .placeholder-label {
+        color: var(--quiet);
+        font-family: var(--data);
+        font-size: 9px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .mock-record-button {
+        min-width: 96px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 8px;
+        background: var(--record);
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      .mock-record-button::before {
+        width: 8px;
+        height: 8px;
+        border: 2px solid white;
+        border-radius: 50%;
+        content: "";
+      }
+
+      .source-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .source-card {
+        min-height: 158px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        padding: 10px;
+      }
+
+      .source-card:first-child {
+        border-color: rgb(255 69 58 / 0.7);
+        box-shadow: 0 0 0 1px rgb(255 69 58 / 0.2) inset;
+      }
+
+      .source-preview {
+        height: 104px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 6px;
+        background:
+          linear-gradient(90deg, #1b1f25 27%, transparent 27%),
+          linear-gradient(#20252c 16%, transparent 16%),
+          #15191f;
+      }
+
+      .source-preview::before,
+      .source-preview::after {
+        position: absolute;
+        right: 10px;
+        left: 34%;
+        height: 12px;
+        border-radius: 3px;
+        background: #282d35;
+        content: "";
+      }
+
+      .source-preview::before {
+        top: 28px;
+      }
+
+      .source-preview::after {
+        top: 50px;
+        width: 42%;
+      }
+
+      .source-name {
+        display: block;
+        margin-top: 9px;
+        color: #c9c9c5;
+        font-size: 9px;
+      }
+
+      .selection-frame {
+        position: absolute;
+        inset: 82px 52px 95px 130px;
+        border: 1px solid rgb(255 69 58 / 0.86);
+        border-radius: 8px;
+        pointer-events: none;
+      }
+
+      .selection-frame::before,
+      .selection-frame::after {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-color: var(--record);
+        content: "";
+      }
+
+      .selection-frame::before {
+        top: -3px;
+        left: -3px;
+        border-top: 3px solid;
+        border-left: 3px solid;
+        border-radius: 6px 0 0;
+      }
+
+      .selection-frame::after {
+        right: -3px;
+        bottom: -3px;
+        border-right: 3px solid;
+        border-bottom: 3px solid;
+        border-radius: 0 0 6px;
+      }
+
+      .scan-line {
+        position: absolute;
+        top: 84px;
+        right: 53px;
+        left: 131px;
+        height: 1px;
+        background: var(--record);
+        box-shadow: 0 10px 22px -8px rgb(255 69 58 / 0.8);
+        animation: scan 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+
+      .floating-controls {
+        position: absolute;
+        right: 34px;
+        bottom: 26px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid var(--line-bright);
+        border-radius: 13px;
+        background: #191b20;
+        padding: 7px 9px 7px 13px;
+        box-shadow: 0 18px 42px -18px #000;
+      }
+
+      .control-drag {
+        width: 6px;
+        height: 22px;
+        opacity: 0.6;
+        background: radial-gradient(circle, var(--quiet) 1px, transparent 1.5px) 0 0 / 5px 5px;
+      }
+
+      .recording-dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--record);
+        box-shadow: 0 0 0 4px rgb(255 69 58 / 0.12);
+      }
+
+      .timer {
+        color: #f0efeb;
+        font-family: var(--data);
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .control-separator {
+        width: 1px;
+        height: 24px;
+        background: var(--line-bright);
+      }
+
+      .control-button {
+        width: 32px;
+        height: 32px;
+        position: relative;
+        border-radius: 8px;
+        background: #25282f;
+      }
+
+      .control-button.pause::before {
+        position: absolute;
+        inset: 10px 9px;
+        border-right: 3px solid #d6d5d1;
+        border-left: 3px solid #d6d5d1;
+        content: "";
+      }
+
+      .control-button.stop::before {
+        position: absolute;
+        inset: 10px;
+        border-radius: 2px;
+        background: var(--record);
+        content: "";
+      }
+
+      .stage-note {
+        position: absolute;
+        right: 20px;
+        bottom: -34px;
+        color: var(--quiet);
+        font-family: var(--data);
+        font-size: 10px;
+      }
+
+      @keyframes scan {
+        0%,
+        100% {
+          transform: translateY(0);
+          opacity: 0;
+        }
+        10%,
+        85% {
+          opacity: 0.8;
+        }
+        75% {
+          transform: translateY(337px);
+        }
+      }
+
+      .proof-strip {
+        border-block: 1px solid var(--line);
+        background: #0c0e11;
+      }
+
+      .proof-grid {
+        width: var(--content);
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .proof-item {
+        min-height: 128px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 1px solid var(--line);
+        padding: 24px 28px;
+      }
+
+      .proof-item:first-child {
+        border-left: 1px solid var(--line);
+      }
+
+      .proof-value {
+        font-family: var(--display);
+        font-size: 1.8rem;
+        font-weight: 650;
+        letter-spacing: -0.03em;
+      }
+
+      .proof-label {
+        margin-top: 5px;
+        color: var(--quiet);
+        font-size: 12px;
+      }
+
+      .section {
+        width: var(--content);
+        margin: 0 auto;
+        padding: 140px 0;
+      }
+
+      .section-heading {
+        max-width: 790px;
+        font-size: clamp(2.4rem, 5vw, 4.75rem);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+      }
+
+      .section-intro {
+        max-width: 620px;
+        margin-top: 22px;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.75;
+      }
+
+      .sequence {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+        margin-top: 70px;
+        border-block: 1px solid var(--line);
+      }
+
+      .step {
+        min-height: 310px;
+        position: relative;
+        padding: 34px 34px 40px;
+      }
+
+      .step + .step {
+        border-left: 1px solid var(--line);
+      }
+
+      .step-number {
+        color: var(--record);
+        font-family: var(--data);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .step h3 {
+        max-width: 280px;
+        margin-top: 70px;
+        font-family: var(--display);
+        font-size: 1.75rem;
+        line-height: 1.05;
+        letter-spacing: -0.025em;
+      }
+
+      .step p {
+        max-width: 320px;
+        margin-top: 15px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .step-action {
+        position: absolute;
+        top: 32px;
+        right: 34px;
+        color: var(--quiet);
+        font-family: var(--data);
+        font-size: 10px;
+        text-transform: uppercase;
+      }
+
+      .feature-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.78fr) minmax(460px, 1.22fr);
+        gap: 86px;
+        align-items: start;
+      }
+
+      .feature-copy {
+        position: sticky;
+        top: 118px;
+      }
+
+      .feature-list {
+        border-top: 1px solid var(--line);
+      }
+
+      .feature-row {
+        display: grid;
+        grid-template-columns: 74px 1fr;
+        gap: 22px;
+        border-bottom: 1px solid var(--line);
+        padding: 34px 0;
+      }
+
+      .feature-symbol {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line-bright);
+        border-radius: 12px;
+        color: var(--record);
+        font-family: var(--data);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .feature-row h3 {
+        font-family: var(--display);
+        font-size: 1.45rem;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+      }
+
+      .feature-row p {
+        max-width: 550px;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .release-panel {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line-bright);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        padding: clamp(34px, 6vw, 74px);
+      }
+
+      .release-panel::after {
+        position: absolute;
+        right: -80px;
+        bottom: -100px;
+        width: 300px;
+        height: 300px;
+        border: 54px solid rgb(255 69 58 / 0.08);
+        border-radius: 50%;
+        content: "";
+      }
+
+      .release-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: end;
+        gap: 60px;
+      }
+
+      .release-panel h2 {
+        max-width: 720px;
+        font-size: clamp(2.5rem, 5.6vw, 5.2rem);
+        line-height: 0.94;
+        letter-spacing: -0.04em;
+      }
+
+      .release-panel p {
+        max-width: 580px;
+        margin-top: 22px;
+        color: var(--muted);
+      }
+
+      .release-data {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        margin-top: 28px;
+        color: var(--quiet);
+        font-family: var(--data);
+        font-size: 11px;
+      }
+
+      .site-footer {
+        width: var(--content);
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+        border-top: 1px solid var(--line);
+        padding: 38px 0 48px;
+        color: var(--quiet);
+        font-size: 12px;
+      }
+
+      .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .prototype-note {
+        font-family: var(--data);
+        text-align: right;
+      }
+
+      @media (max-width: 1040px) {
+        :root {
+          --content: min(100% - 36px, 860px);
+        }
+
+        .hero {
+          grid-template-columns: 1fr;
+          gap: 68px;
+          padding-top: 154px;
+        }
+
+        .hero-copy {
+          max-width: 760px;
+        }
+
+        .capture-wrap {
+          max-width: 760px;
+          width: 100%;
+          margin-left: auto;
+        }
+
+        .feature-layout {
+          grid-template-columns: 1fr;
+          gap: 58px;
+        }
+
+        .feature-copy {
+          position: static;
+        }
+      }
+
+      @media (max-width: 760px) {
+        :root {
+          --content: calc(100% - 28px);
+        }
+
+        .site-header {
+          padding-top: 10px;
+        }
+
+        .nav {
+          grid-template-columns: 1fr auto;
+          padding-left: 14px;
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        .nav-cta .button {
+          min-height: 44px;
+          padding-inline: 14px;
+          font-size: 12px;
+        }
+
+        .nav-cta .button span:last-child {
+          display: none;
+        }
+
+        .hero {
+          min-height: auto;
+          gap: 50px;
+          padding: 128px 0 72px;
+        }
+
+        h1 {
+          font-size: clamp(3.15rem, 17vw, 5rem);
+        }
+
+        .hero-lede {
+          font-size: 1rem;
+        }
+
+        .hero-actions {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+
+        .hero-actions .button {
+          width: 100%;
+        }
+
+        .capture-stage {
+          min-height: 430px;
+        }
+
+        .capture-wrap::before {
+          inset: -32px 0;
+        }
+
+        .window-content {
+          min-height: 388px;
+          grid-template-columns: 64px 1fr;
+        }
+
+        .mock-sidebar {
+          padding-inline: 8px;
+        }
+
+        .mock-nav-item {
+          justify-content: center;
+          padding: 0;
+          font-size: 0;
+        }
+
+        .mock-main {
+          padding: 22px 16px;
+        }
+
+        .source-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .source-card:nth-child(2) {
+          display: none;
+        }
+
+        .selection-frame {
+          inset: 76px 28px 78px 87px;
+        }
+
+        .scan-line {
+          top: 78px;
+          right: 29px;
+          left: 88px;
+        }
+
+        .floating-controls {
+          right: 16px;
+          bottom: 16px;
+          gap: 9px;
+        }
+
+        .stage-note {
+          display: none;
+        }
+
+        @keyframes scan {
+          0%,
+          100% {
+            transform: translateY(0);
+            opacity: 0;
+          }
+          10%,
+          85% {
+            opacity: 0.8;
+          }
+          75% {
+            transform: translateY(250px);
+          }
+        }
+
+        .proof-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .proof-item:nth-child(3) {
+          border-left: 1px solid var(--line);
+        }
+
+        .proof-item:nth-child(-n + 2) {
+          border-bottom: 1px solid var(--line);
+        }
+
+        .section {
+          padding: 100px 0;
+        }
+
+        .sequence {
+          grid-template-columns: 1fr;
+        }
+
+        .step {
+          min-height: 250px;
+          padding-inline: 20px;
+        }
+
+        .step + .step {
+          border-top: 1px solid var(--line);
+          border-left: 0;
+        }
+
+        .step h3 {
+          margin-top: 52px;
+        }
+
+        .feature-row {
+          grid-template-columns: 54px 1fr;
+          gap: 14px;
+        }
+
+        .feature-symbol {
+          width: 44px;
+          height: 44px;
+        }
+
+        .release-grid {
+          grid-template-columns: 1fr;
+          align-items: start;
+          gap: 34px;
+        }
+
+        .release-grid .button {
+          width: 100%;
+        }
+
+        .site-footer {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .prototype-note {
+          text-align: left;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="#top" aria-label="WinRecorder home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>WinRecorder</span>
+        </a>
+
+        <div class="nav-links">
+          <a href="#flow">How it works</a>
+          <a href="#details">What it does</a>
+          <a href="#release">Release</a>
+        </div>
+
+        <div class="nav-cta">
+          <a
+            class="button"
+            href="#prototype"
+            aria-label="Preview the WinRecorder recording flow"
+          >
+            <span class="windows-glyph" aria-hidden="true">
+              <i></i><i></i><i></i><i></i>
+            </span>
+            <span>Preview the flow</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <div class="status-chip">Windows 10 &amp; 11 · Alpha preview</div>
+          <h1>Capture what matters. Keep moving.</h1>
+          <p class="hero-lede">
+            WinRecorder turns a window, display, or selected region into a ready-to-share MP4.
+            No project file, account, watermark, or background service between you and the clip.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="#prototype">
+              <span class="windows-glyph" aria-hidden="true">
+                <i></i><i></i><i></i><i></i>
+              </span>
+              See the prototype
+            </a>
+            <a class="button button-secondary" href="#flow">Follow the recording flow</a>
+          </div>
+          <div class="hero-meta" aria-label="Build details">
+            <span>v2.0.0-alpha.6</span>
+            <span>2.5 MB installer</span>
+            <span>x64</span>
+          </div>
+        </div>
+
+        <div class="capture-wrap" id="prototype">
+          <div
+            class="capture-stage"
+            role="img"
+            aria-label="Placeholder WinRecorder interface showing a selected capture area and floating recording controls"
+          >
+            <div class="window-bar">
+              <div class="window-app">
+                <span class="brand-mark" aria-hidden="true"></span>
+                WinRecorder
+              </div>
+              <div class="window-actions" aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
+
+            <div class="window-content" aria-hidden="true">
+              <aside class="mock-sidebar">
+                <div class="mock-nav-item active">Record</div>
+                <div class="mock-nav-item">Library</div>
+                <div class="mock-nav-item">Settings</div>
+              </aside>
+
+              <div class="mock-main">
+                <div class="mock-topline">
+                  <span class="placeholder-label">Choose what to capture</span>
+                  <span class="mock-record-button">Record</span>
+                </div>
+                <div class="source-grid">
+                  <div class="source-card">
+                    <div class="source-preview"></div>
+                    <span class="source-name">Design review · selected window</span>
+                  </div>
+                  <div class="source-card">
+                    <div class="source-preview"></div>
+                    <span class="source-name">Full display · 1920 × 1080</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="selection-frame" aria-hidden="true"></div>
+            <div class="scan-line" aria-hidden="true"></div>
+            <div class="floating-controls" aria-hidden="true">
+              <span class="control-drag"></span>
+              <span class="recording-dot"></span>
+              <span class="timer">00:08</span>
+              <span class="control-separator"></span>
+              <span class="control-button pause"></span>
+              <span class="control-button stop"></span>
+            </div>
+          </div>
+          <p class="stage-note">Interface placeholder · no media wired</p>
+        </div>
+      </section>
+
+      <section class="proof-strip" aria-label="Product facts">
+        <div class="proof-grid">
+          <div class="proof-item">
+            <strong class="proof-value">2.5 MB</strong>
+            <span class="proof-label">Small Windows installer</span>
+          </div>
+          <div class="proof-item">
+            <strong class="proof-value">MP4</strong>
+            <span class="proof-label">Ready when recording stops</span>
+          </div>
+          <div class="proof-item">
+            <strong class="proof-value">30 / 60</strong>
+            <span class="proof-label">Frames per second</span>
+          </div>
+          <div class="proof-item">
+            <strong class="proof-value">0 accounts</strong>
+            <span class="proof-label">Local by default</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="flow">
+        <h2 class="section-heading">Three deliberate actions. One finished clip.</h2>
+        <p class="section-intro">
+          The interface keeps the recording sequence visible: choose a source, control the
+          capture from a compact floating bar, then find the finished file in your library.
+        </p>
+
+        <div class="sequence">
+          <article class="step">
+            <span class="step-number">01</span>
+            <span class="step-action">Choose</span>
+            <h3>Pick the exact screen area</h3>
+            <p>Record a display, one window, or drag a region around only the work that matters.</p>
+          </article>
+          <article class="step">
+            <span class="step-number">02</span>
+            <span class="step-action">Record</span>
+            <h3>Move the controls out of your way</h3>
+            <p>Pause, resume, and stop from a compact bar you can park anywhere on the desktop.</p>
+          </article>
+          <article class="step">
+            <span class="step-number">03</span>
+            <span class="step-action">Keep</span>
+            <h3>Open the MP4 immediately</h3>
+            <p>The library shows each take with its duration, size, thumbnail, and file actions.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section feature-layout" id="details">
+        <div class="feature-copy">
+          <h2 class="section-heading">A recorder that knows when to disappear.</h2>
+          <p class="section-intro">
+            WinRecorder keeps its surface small and its output ordinary. The useful part is the
+            clip—not a proprietary project or a service you need to manage.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <article class="feature-row">
+            <span class="feature-symbol" aria-hidden="true">SRC</span>
+            <div>
+              <h3>Display, window, or region</h3>
+              <p>Choose the boundary before recording. Optional system audio and microphone stay synchronized with the picture.</p>
+            </div>
+          </article>
+          <article class="feature-row">
+            <span class="feature-symbol" aria-hidden="true">MP4</span>
+            <div>
+              <h3>No export queue</h3>
+              <p>H.264 is encoded while you record, so the clip is already on disk when you press stop.</p>
+            </div>
+          </article>
+          <article class="feature-row">
+            <span class="feature-symbol" aria-hidden="true">LIB</span>
+            <div>
+              <h3>A practical local library</h3>
+              <p>Reveal, rename, open, or delete a take without searching through dated folders.</p>
+            </div>
+          </article>
+          <article class="feature-row">
+            <span class="feature-symbol" aria-hidden="true">OFF</span>
+            <div>
+              <h3>Nothing running after exit</h3>
+              <p>No account, telemetry, watermark, or background service. Close the app and it is closed.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="release">
+        <div class="release-panel">
+          <div class="release-grid">
+            <div>
+              <h2>Ready for the next thirty seconds.</h2>
+              <p>
+                This file is a visual prototype only. Replace the placeholder capture stage with
+                final product media when the landing page direction is approved.
+              </p>
+              <div class="release-data">
+                <span>WinRecorder 2.0.0-alpha.6</span>
+                <span>Windows 10 &amp; 11</span>
+                <span>Prototype artifact</span>
+              </div>
+            </div>
+            <a class="button" href="#top">Return to the prototype</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        WinRecorder
+      </div>
+      <p class="prototype-note">Standalone HTML prototype · placeholders only</p>
+    </footer>
+  </body>
+</html>
