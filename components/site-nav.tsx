@@ -26,6 +26,7 @@ export function SiteNav({ version }: { version: string }) {
 
         <a
           href="/api/download"
+          aria-label={`Download WinRecorder ${version} for Windows`}
           className="ml-auto inline-flex h-11 items-center gap-1.5 rounded-full bg-ink px-3.5 text-[12.5px] font-medium text-[#0c0c0d] transition hover:bg-white sm:ml-2"
         >
           <WindowsMark className="size-3.5" />

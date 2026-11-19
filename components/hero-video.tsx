@@ -18,7 +18,6 @@ export function HeroVideo() {
               aria-label="Screen recording of WinRecorder: recording the desktop, then browsing the library and settings"
             >
               <source src="/media/winrecorder-hero.mp4" type="video/mp4" />
-              <source src="/media/winrecorder-hero.webm" type="video/webm" />
             </video>
           </div>
         </div>

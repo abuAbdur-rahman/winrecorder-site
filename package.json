@@ -6,13 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsc -p tsconfig.test.json && node --test .test-dist/tests/release.test.js"
   },
   "dependencies": {
     "@vercel/blob": "^2.9.0",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "semver": "^7.8.6",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -20,10 +22,14 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/semver": "^7.8.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   },
   "packageManager": "pnpm@12.9.1"
 }

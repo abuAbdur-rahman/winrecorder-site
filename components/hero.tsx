@@ -41,7 +41,7 @@ export function Hero({ version, size, pubDate }: Props) {
             day: "numeric",
             year: "numeric",
           })}{" "}
-          · Signed installer · Free alpha build
+          · Signed updates · Free alpha build
         </p>
       </div>
     </section>

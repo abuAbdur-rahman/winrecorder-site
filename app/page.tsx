@@ -13,7 +13,6 @@ import { readRelease } from "@/lib/release";
 export const instant = false;
 
 export const metadata: Metadata = {
-  title: "WinRecorder — fast screen recording for Windows",
   description:
     "Record a window or your whole display to MP4 in one keystroke. No accounts, no watermarks, no background service. Free alpha for Windows 10 and 11.",
   openGraph: {

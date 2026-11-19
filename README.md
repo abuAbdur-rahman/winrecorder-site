@@ -24,11 +24,11 @@ No environment variables are required locally: the site falls back to `content/r
 | `/api/download` | GET/HEAD | 302 to the newest installer. Stable link for the site and README. |
 | `/api/release` | GET | Current release record (public, no secrets). |
 | `/api/release` | POST | Publish a release manifest. Requires `Authorization: Bearer $RELEASE_TOKEN`. |
-| `/api/release/asset?kind=installer\|updater\|signature` | POST | Upload one file (raw body, `x-file-name` header, max 4 MB) and receive its blob URL. |
+| `/api/release/asset?kind=installer\|updater` | POST | Upload one immutable file (raw body plus `x-file-name`) and receive its verified Blob URL. Installers must be under 3 MB; updater payloads under 4 MiB. |
 
 ### Publishing a release
 
-Assets are uploaded one request at a time so each stays under the serverless body limit, then the manifest is written.
+Assets are uploaded one request at a time so each stays under the serverless body limit, then the manifest is written. Asset paths are immutable; use a new versioned file name for every release. The updater signature is supplied as base64 text in the manifest, not uploaded as a separate asset.
 
 ```bash
 SITE=https://winrecorder-site.vercel.app

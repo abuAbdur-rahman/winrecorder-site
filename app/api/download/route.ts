@@ -23,20 +23,3 @@ export async function GET(request: Request) {
     return Response.json({ error: "No installer available" }, { status: 500 });
   }
 }
-
-export async function HEAD(request: Request) {
-  await connection();
-  try {
-    const release = await readRelease();
-    return new Response(null, {
-      status: 302,
-      headers: {
-        location: absoluteUrl(release.installer.url, request.url),
-        "cache-control": "no-store",
-      },
-    });
-  } catch (error) {
-    console.error("HEAD /api/download failed", error);
-    return new Response(null, { status: 500 });
-  }
-}

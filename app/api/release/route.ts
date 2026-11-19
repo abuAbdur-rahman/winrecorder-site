@@ -2,35 +2,18 @@ import { connection } from "next/server";
 import { z } from "zod";
 
 import {
+  ReleaseInputSchema,
   errorResponse,
+  getReleasePublishDecision,
+  logServerError,
+  parseJsonBody,
   readRelease,
+  readReleaseForPublish,
   requireReleaseToken,
+  verifyReleaseAsset,
   writeRelease,
   type Release,
 } from "@/lib/release";
-
-const AssetUrlSchema = z
-  .string()
-  .url()
-  .refine((url) => url.startsWith("https://"), "Asset URL must use HTTPS");
-
-const AssetSchema = z.object({
-  name: z.string().min(1).max(200),
-  size: z.number().int().positive(),
-  url: AssetUrlSchema,
-});
-
-const ReleaseSchema = z.object({
-  version: z
-    .string()
-    .regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/, "Must be a semver version"),
-  notes: z.string().max(2000).default(""),
-  pubDate: z.iso.datetime().optional(),
-  installer: AssetSchema,
-  updater: AssetSchema.extend({
-    signature: z.string().min(1).max(4000),
-  }),
-});
 
 /** Current release record, used by the release workflow for a pre-flight read. */
 export async function GET() {
@@ -55,7 +38,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     requireReleaseToken(request);
-    const parsed = ReleaseSchema.safeParse(await request.json());
+    const parsed = ReleaseInputSchema.safeParse(await parseJsonBody(request));
     if (!parsed.success) {
       return Response.json(
         { error: "Invalid release payload", details: z.flattenError(parsed.error) },
@@ -72,10 +55,35 @@ export async function POST(request: Request) {
       updater: payload.updater,
     };
 
-    const manifestUrl = await writeRelease(release);
-    return Response.json({ ok: true, version: release.version, manifestUrl });
+    const current = await readReleaseForPublish();
+    const decision = getReleasePublishDecision(
+      current.release,
+      release,
+      current.stored,
+    );
+    if (decision === "unchanged") {
+      return Response.json({
+        ok: true,
+        idempotent: true,
+        version: release.version,
+        manifestUrl: current.manifestUrl,
+      });
+    }
+
+    const [installer, updater] = await Promise.all([
+      verifyReleaseAsset("installer", release.installer),
+      verifyReleaseAsset("updater", release.updater),
+    ]);
+    const verifiedRelease: Release = {
+      ...release,
+      installer,
+      updater: { ...updater, signature: release.updater.signature },
+    };
+
+    const manifestUrl = await writeRelease(verifiedRelease, current.etag);
+    return Response.json({ ok: true, version: verifiedRelease.version, manifestUrl });
   } catch (error) {
-    console.error("POST /api/release failed", error);
+    logServerError("POST /api/release failed", error);
     return errorResponse(error);
   }
 }

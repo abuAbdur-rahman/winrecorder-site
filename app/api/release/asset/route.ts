@@ -1,17 +1,19 @@
 import {
+  ASSET_KINDS,
   errorResponse,
+  logServerError,
+  parseAssetFileName,
   requireReleaseToken,
+  validateAssetBody,
+  validateAssetSize,
   writeAsset,
+  type AssetKind,
 } from "@/lib/release";
 
-const MAX_ASSET_BYTES = 4 * 1024 * 1024;
-const KINDS = ["installer", "updater", "signature"] as const;
-type Kind = (typeof KINDS)[number];
 const FILE_PATTERNS = {
   installer: /\.exe$/i,
   updater: /\.nsis\.zip$/i,
-  signature: /\.sig$/i,
-} satisfies Record<Kind, RegExp>;
+} satisfies Record<AssetKind, RegExp>;
 
 /**
  * Uploads a single release asset (one request per file, keeping each body
@@ -26,18 +28,16 @@ export async function POST(request: Request) {
   try {
     requireReleaseToken(request);
 
-    const kind = new URL(request.url).searchParams.get("kind") as Kind | null;
-    if (!kind || !KINDS.includes(kind)) {
+    const rawKind = new URL(request.url).searchParams.get("kind");
+    if (!rawKind || !ASSET_KINDS.includes(rawKind as AssetKind)) {
       return Response.json(
-        { error: `kind must be one of: ${KINDS.join(", ")}` },
+        { error: `kind must be one of: ${ASSET_KINDS.join(", ")}` },
         { status: 400 },
       );
     }
+    const kind = rawKind as AssetKind;
 
-    const fileName = sanitizeFileName(request.headers.get("x-file-name") ?? "");
-    if (!fileName) {
-      return Response.json({ error: "x-file-name header is required" }, { status: 400 });
-    }
+    const fileName = parseAssetFileName(request.headers.get("x-file-name"));
     if (!FILE_PATTERNS[kind].test(fileName)) {
       return Response.json(
         { error: `Invalid file name for ${kind}` },
@@ -47,50 +47,18 @@ export async function POST(request: Request) {
 
     const contentLength = request.headers.get("content-length");
     const declaredLength = Number(contentLength ?? "0");
-    if (
-      contentLength !== null &&
-      (!Number.isSafeInteger(declaredLength) || declaredLength < 0)
-    ) {
-      return Response.json({ error: "Invalid content-length header" }, { status: 400 });
-    }
-    if (declaredLength > MAX_ASSET_BYTES) {
-      return Response.json(
-        { error: `Asset exceeds ${MAX_ASSET_BYTES} bytes; publish it from a smaller build` },
-        { status: 413 },
-      );
+    if (contentLength !== null) {
+      validateAssetSize(kind, declaredLength);
     }
 
     const body = await request.arrayBuffer();
-    if (body.byteLength === 0) {
-      return Response.json({ error: "Empty body" }, { status: 400 });
-    }
-    if (body.byteLength > MAX_ASSET_BYTES) {
-      return Response.json({ error: "Asset too large" }, { status: 413 });
-    }
+    validateAssetSize(kind, body.byteLength);
+    validateAssetBody(kind, body);
 
-    const contentType =
-      kind === "signature"
-        ? "text/plain; charset=utf-8"
-        : "application/octet-stream";
-
-    const asset = await writeAsset(fileName, contentType, body);
+    const asset = await writeAsset(fileName, "application/octet-stream", body);
     return Response.json({ ok: true, kind, ...asset });
   } catch (error) {
-    console.error("POST /api/release/asset failed", error);
+    logServerError("POST /api/release/asset failed", error);
     return errorResponse(error);
   }
-}
-
-function sanitizeFileName(raw: string): string | null {
-  const value = raw.trim();
-  if (!value) return null;
-  const base = value.split(/[\\/]/).pop() ?? "";
-  if (
-    base.length > 180 ||
-    !/^[A-Za-z0-9._-]+$/.test(base) ||
-    base.startsWith(".")
-  ) {
-    return null;
-  }
-  return base;
 }
