@@ -3,8 +3,7 @@ import { connection } from "next/server";
 
 import { Features } from "@/components/features";
 import { Hero } from "@/components/hero";
-import { HeroVideo } from "@/components/hero-video";
-import { HowItWorks } from "@/components/how-it-works";
+import { ProductTour } from "@/components/product-tour";
 import { Release } from "@/components/release";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
@@ -37,23 +36,12 @@ export default async function HomePage() {
       </a>
       <SiteNav version={release.version} />
       <main id="main-content" tabIndex={-1} className="flex-1">
-        <Hero
-          version={release.version}
-          size={release.installer.size}
-          pubDate={release.pubDate}
-        />
-        <HeroVideo />
+        <Hero version={release.version} size={release.installer.size} />
+        <ProductTour />
         <Features />
-        <HowItWorks />
-        <Release
-          version={release.version}
-          pubDate={release.pubDate}
-          notes={release.notes}
-          size={release.installer.size}
-          updaterSize={release.updater.size}
-        />
+        <Release version={release.version} size={release.installer.size} />
       </main>
-      <SiteFooter version={release.version} />
+      <SiteFooter />
     </div>
   );
 }

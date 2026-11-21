@@ -3,46 +3,30 @@ import { DownloadButton } from "@/components/download-button";
 type Props = {
   version: string;
   size: number;
-  pubDate: string;
 };
 
-export function Hero({ version, size, pubDate }: Props) {
+export function Hero({ version, size }: Props) {
   return (
-    <section className="glow relative isolate overflow-hidden px-5 pt-28 pb-10 sm:pt-36">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-px bg-linear-to-r from-transparent via-line to-transparent"
-      />
-      <div className="mx-auto flex max-w-5xl flex-col items-center text-center">
-        <p className="rise rise-1 inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1 font-mono text-[11px] text-muted backdrop-blur">
-          <span className="size-1.5 rounded-full bg-rec shadow-[0_0_10px_var(--color-rec)]" />
-          Pre-release v{version} · Windows 10 &amp; 11
-        </p>
-
-        <h1 className="display rise rise-2 mt-7 max-w-4xl text-[clamp(2.6rem,7.2vw,5.1rem)] font-semibold">
-          Your screen, recorded
-          <br className="hidden sm:block" /> before you lose the moment.
+    <section className="px-5 pt-36 pb-12 sm:pt-44 sm:pb-16">
+      <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)] lg:items-end lg:gap-20">
+        <h1 className="display max-w-4xl text-[clamp(3.25rem,8vw,6rem)] font-semibold">
+          Record the screen.
+          <span className="block text-muted">Keep the MP4.</span>
         </h1>
 
-        <p className="rise rise-3 mt-6 max-w-xl text-pretty text-[15px] leading-7 text-muted sm:text-base">
-          WinRecorder is a {(size / 1024 / 1024).toFixed(1)} MB Windows app for
-          quick captures: pick a window or the full display, hit record, get an
-          MP4 in your Videos folder. No accounts, no watermarks, no background
-          service.
-        </p>
-
-        <div className="rise rise-4 mt-9">
-          <DownloadButton version={version} size={size} />
+        <div className="lg:pb-2">
+          <p className="max-w-md text-pretty text-base leading-7 text-muted">
+            Pick a display, window, or region. The file is ready when you stop.
+          </p>
+          <div className="mt-7">
+            <DownloadButton
+              version={version}
+              size={size}
+              align="start"
+              showMeta={false}
+            />
+          </div>
         </div>
-
-        <p className="mt-4 font-mono text-[11px] text-muted">
-          {new Date(pubDate).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}{" "}
-          · Signed updates · Free alpha build
-        </p>
       </div>
     </section>
   );

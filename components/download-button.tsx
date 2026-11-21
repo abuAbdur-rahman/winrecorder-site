@@ -6,6 +6,8 @@ type Props = {
   size: number;
   href?: string;
   label?: string;
+  align?: "start" | "center";
+  showMeta?: boolean;
 };
 
 export function DownloadButton({
@@ -13,20 +15,28 @@ export function DownloadButton({
   size,
   href = "/api/download",
   label = "Download for Windows",
+  align = "center",
+  showMeta = true,
 }: Props) {
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div
+      className={`flex flex-col gap-3 ${
+        align === "start" ? "items-start" : "items-center"
+      }`}
+    >
       <a
         href={href}
         download
-        className="group inline-flex h-12 items-center gap-2.5 rounded-full bg-ink px-6 text-[15px] font-medium text-[#0c0c0d] shadow-[0_1px_0_rgba(255,255,255,0.5)_inset,0_10px_30px_-12px_rgba(255,255,255,0.35)] transition hover:-translate-y-px hover:bg-white active:translate-y-0"
+        className="inline-flex h-12 items-center gap-2.5 rounded-lg bg-ink px-5 text-[14px] font-medium text-bg transition-colors hover:bg-white"
       >
         <WindowsMark className="size-4" />
         {label}
       </a>
-      <p className="font-mono text-[11px] tracking-tight text-muted">
-        v{version} · {formatBytes(size)} · x64
-      </p>
+      {showMeta ? (
+        <p className="font-mono text-[10.5px] tracking-tight text-muted">
+          v{version} · {formatBytes(size)} · Windows x64
+        </p>
+      ) : null}
     </div>
   );
 }

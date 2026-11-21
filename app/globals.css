@@ -26,6 +26,7 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
+    scrollbar-color: var(--color-line) var(--color-bg);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -54,24 +55,6 @@
     text-wrap: balance;
   }
 
-  .eyebrow {
-    font-size: 0.6875rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-
-  .hairline {
-    background-image: linear-gradient(
-      to right,
-      transparent,
-      var(--color-line) 18%,
-      var(--color-line) 82%,
-      transparent
-    );
-    height: 1px;
-  }
-
   .frame {
     border: 1px solid var(--color-line);
     border-radius: var(--radius-card);
@@ -79,55 +62,68 @@
     box-shadow: var(--shadow-frame);
   }
 
-  .glow::before {
-    content: "";
-    position: absolute;
-    inset: -25% 10% auto;
-    height: 60vh;
-    background: radial-gradient(
-      ellipse at center,
-      color-mix(in srgb, var(--color-rec) 16%, transparent),
-      transparent 65%
-    );
-    filter: blur(30px);
-    pointer-events: none;
-    z-index: 0;
-  }
 }
 
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+/* App preview: mirrors the WinRecorder desktop prototype. */
+.wr-app {
+  --wr-bg: #111113;
+  --wr-surface: var(--color-surface);
+  --wr-surface-2: var(--color-surface-2);
+  --wr-line: var(--color-line);
+  --wr-ink: var(--color-ink);
+  --wr-muted: var(--color-muted);
+  --wr-rec: var(--color-rec);
+  --wr-bar: #26282b;
+  --wr-bar-2: #383b3f;
+  --wr-amber: #f2b84b;
 }
 
-.rise {
-  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+.wr-app .tg input:checked + s {
+  background: var(--wr-muted);
 }
 
-.rise-1 {
-  animation-delay: 0.05s;
-}
-.rise-2 {
-  animation-delay: 0.12s;
-}
-.rise-3 {
-  animation-delay: 0.2s;
-}
-.rise-4 {
-  animation-delay: 0.3s;
+@media (max-width: 640px) {
+  .wr-app {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .wr-pane {
+    order: 1;
+  }
+
+  .wr-rail {
+    order: 2;
+    position: static !important;
+    height: auto !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    padding: 8px 0 !important;
+    border-right: 0 !important;
+    border-top: 1px solid #e7e5e2;
+  }
+
+  .wr-logo,
+  .wr-rail-sp,
+  .wr-nav-indicator {
+    display: none !important;
+  }
+
+  .wr-recent {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .wr-recent > *:nth-child(3) {
+    display: none !important;
+  }
+
+  .wr-main {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-  .rise {
-    animation: none;
   }
 }
