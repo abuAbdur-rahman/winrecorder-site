@@ -12,7 +12,10 @@ export type ReleaseAsset = {
 };
 
 export type UpdaterAsset = ReleaseAsset & {
-  /** Tauri minisign signature over the .nsis.zip payload. */
+  /**
+   * Tauri minisign signature over the updater payload. Tauri v2 uses the
+   * signed NSIS installer `.exe`; `.nsis.zip` stays readable for older builds.
+   */
   signature: string;
 };
 
@@ -44,7 +47,7 @@ export const MAX_UPDATER_BYTES = 4 * 1024 * 1024;
 const SAFE_FILE_NAME = /^[A-Za-z0-9._+-]+$/;
 const ASSET_FILE_PATTERNS = {
   installer: /\.exe$/i,
-  updater: /\.nsis\.zip$/i,
+  updater: /\.(?:exe|nsis\.zip)$/i,
 } satisfies Record<AssetKind, RegExp>;
 
 const SemVerSchema = z
@@ -104,7 +107,10 @@ export const ReleaseInputSchema = z.object({
       message: "Installer name must match the release version",
     });
   }
-  if (release.updater.name !== `${stem}.nsis.zip`) {
+  if (
+    release.updater.name !== `${stem}.exe` &&
+    release.updater.name !== `${stem}.nsis.zip`
+  ) {
     context.addIssue({
       code: "custom",
       path: ["updater", "name"],
@@ -307,8 +313,19 @@ export function validateAssetBody(
   body: ArrayBuffer | Uint8Array,
 ): void {
   const bytes = body instanceof Uint8Array ? body : new Uint8Array(body);
-  const magic = kind === "installer" ? [0x4d, 0x5a] : [0x50, 0x4b];
-  if (magic.some((byte, index) => bytes[index] !== byte)) {
+  // Installers are executables. Updater payloads are either the signed NSIS
+  // executable (Tauri v2) or the legacy zipped installer.
+  const signatures =
+    kind === "installer"
+      ? [[0x4d, 0x5a]]
+      : [
+          [0x4d, 0x5a],
+          [0x50, 0x4b],
+        ];
+  const matches = signatures.some((signature) =>
+    signature.every((byte, index) => bytes[index] === byte),
+  );
+  if (!matches) {
     throw new HttpError(422, `Asset contents do not match ${kind} file type`);
   }
 }

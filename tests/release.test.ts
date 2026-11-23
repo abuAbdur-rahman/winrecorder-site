@@ -64,6 +64,20 @@ describe("release payload validation", () => {
     assert.equal(result.success, true);
   });
 
+  it("accepts the signed installer as the updater payload", () => {
+    const result = ReleaseInputSchema.safeParse({
+      ...release,
+      updater: {
+        ...release.updater,
+        name: release.installer.name,
+        size: release.installer.size,
+        url: release.installer.url,
+      },
+    });
+
+    assert.equal(result.success, true);
+  });
+
   it("rejects malformed SemVer accepted by the old regex", () => {
     for (const version of ["01.2.3", "1.2.3-alpha..1"]) {
       const result = ReleaseInputSchema.safeParse({ ...release, version });
@@ -156,8 +170,14 @@ describe("release asset policy", () => {
     assert.doesNotThrow(() =>
       validateAssetBody("updater", Uint8Array.from([0x50, 0x4b, 0x03, 0x04])),
     );
+    assert.doesNotThrow(() =>
+      validateAssetBody("updater", Uint8Array.from([0x4d, 0x5a, 0x90, 0x00])),
+    );
     assert.throws(() =>
       validateAssetBody("installer", Uint8Array.from([0x50, 0x4b, 0x03, 0x04])),
+    );
+    assert.throws(() =>
+      validateAssetBody("updater", Uint8Array.from([0x00, 0x01, 0x02, 0x03])),
     );
   });
 

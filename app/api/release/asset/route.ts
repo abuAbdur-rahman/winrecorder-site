@@ -12,7 +12,7 @@ import {
 
 const FILE_PATTERNS = {
   installer: /\.exe$/i,
-  updater: /\.nsis\.zip$/i,
+  updater: /\.(?:exe|nsis\.zip)$/i,
 } satisfies Record<AssetKind, RegExp>;
 
 /**

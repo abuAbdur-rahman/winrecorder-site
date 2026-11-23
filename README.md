@@ -30,23 +30,19 @@ No environment variables are required locally: the site falls back to `content/r
 
 Assets are uploaded one request at a time so each stays under the serverless body limit, then the manifest is written. Asset paths are immutable; use a new versioned file name for every release. The updater signature is supplied as base64 text in the manifest, not uploaded as a separate asset.
 
+Tauri v2 signs the NSIS installer itself, so one `.exe` serves as both the download and the updater payload. The manifest repeats the same name, size, and URL for `installer` and `updater`, and `updater.signature` is the contents of the `.exe.sig` file. A legacy `.nsis.zip` payload is still accepted for older releases.
+
 ```bash
 SITE=https://winrecorder-site.vercel.app
 TOKEN=$RELEASE_TOKEN
 
-# 1. installer (.exe)
+# 1. signed installer (.exe)
 curl -X POST "$SITE/api/release/asset?kind=installer" \
   -H "authorization: Bearer $TOKEN" \
   -H "x-file-name: WinRecorder_2.0.0_x64-setup.exe" \
   --data-binary @WinRecorder_2.0.0_x64-setup.exe
 
-# 2. updater payload (.nsis.zip)
-curl -X POST "$SITE/api/release/asset?kind=updater" \
-  -H "authorization: Bearer $TOKEN" \
-  -H "x-file-name: WinRecorder_2.0.0_x64-setup.nsis.zip" \
-  --data-binary @WinRecorder_2.0.0_x64-setup.nsis.zip
-
-# 3. manifest
+# 2. manifest
 curl -X POST "$SITE/api/release" \
   -H "authorization: Bearer $TOKEN" \
   -H "content-type: application/json" \
@@ -54,7 +50,7 @@ curl -X POST "$SITE/api/release" \
     "version": "2.0.0",
     "notes": "What changed",
     "installer": { "name": "..._x64-setup.exe", "size": 2576253, "url": "<url from step 1>" },
-    "updater":   { "name": "..._x64-setup.nsis.zip", "size": 2557045, "url": "<url from step 2>", "signature": "<contents of .nsis.zip.sig>" }
+    "updater":   { "name": "..._x64-setup.exe", "size": 2576253, "url": "<url from step 1>", "signature": "<contents of .exe.sig>" }
   }'
 ```
 
