@@ -10,6 +10,7 @@ import {
   getReleasePublishDecision,
   parseAssetFileName,
   parseJsonBody,
+  resolveReleaseWriteEtag,
   validateAssetBody,
   validateAssetSize,
   validateReleaseAssetMetadata,
@@ -105,6 +106,17 @@ describe("release payload validation", () => {
 });
 
 describe("release publication policy", () => {
+  it("uses the authoritative Blob ETag when the public response is weak", () => {
+    assert.equal(resolveReleaseWriteEtag('W/"current"', '"current"'), '"current"');
+  });
+
+  it("rejects publication when public content and Blob metadata differ", () => {
+    assert.throws(
+      () => resolveReleaseWriteEtag('"stale"', '"current"'),
+      (error: unknown) => error instanceof HttpError && error.status === 409,
+    );
+  });
+
   it("rejects an older release", () => {
     assert.throws(
       () =>

@@ -189,9 +189,38 @@ export async function readReleaseForPublish(): Promise<ReleaseReadResult> {
   }
 
   const stored = await readBlobRelease();
-  if (stored) return stored;
+  if (stored) {
+    const { BlobNotFoundError, head } = await import("@vercel/blob");
+    try {
+      const metadata = await head(BLOB_MANIFEST_PATH);
+      return {
+        ...stored,
+        etag: resolveReleaseWriteEtag(stored.etag, metadata.etag),
+        manifestUrl: metadata.url,
+      };
+    } catch (error) {
+      if (error instanceof BlobNotFoundError) {
+        throw new HttpError(409, "Release changed while publishing; retry", {
+          cause: error,
+        });
+      }
+      throw error;
+    }
+  }
 
   return { release: await readSeedRelease(), stored: false };
+}
+
+export function resolveReleaseWriteEtag(
+  contentEtag: string | undefined,
+  metadataEtag: string,
+): string {
+  const comparableContentEtag = contentEtag?.replace(/^W\//, "");
+  const comparableMetadataEtag = metadataEtag.replace(/^W\//, "");
+  if (!comparableContentEtag || comparableContentEtag !== comparableMetadataEtag) {
+    throw new HttpError(409, "Release changed while publishing; retry");
+  }
+  return metadataEtag;
 }
 
 export async function writeRelease(
@@ -217,13 +246,6 @@ export async function writeRelease(
     throw error;
   }
 
-  const stored = await readBlobRelease();
-  if (
-    !stored ||
-    getReleasePublishDecision(release, stored.release, true) !== "unchanged"
-  ) {
-    throw new Error("Release manifest failed read-after-write verification");
-  }
   return blob.url;
 }
 
